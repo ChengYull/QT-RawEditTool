@@ -30,10 +30,17 @@ private slots:
 
     void on_fillValueBtn_clicked();
 
+    void on_gaussianBtn_clicked();
+
+    void on_resetBtn_clicked();
+
+    void on_saveBtn_clicked();
+
 private:
     Ui::Widget *ui;
     QSize parseImageSize(const QString &fileName);
     QPoint m_roiStart;
     QPoint m_roiEnd;
+    QString m_fileBaseName;
 };
 #endif // WIDGET_H

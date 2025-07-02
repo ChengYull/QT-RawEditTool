@@ -28,7 +28,7 @@ bool PaintWidget::setRawData(QByteArray &rawData, int width, int height, int pix
         for(int i = 0; i < rawData.size(); i += 2){
             quint16 rawValue = rawData[i + 1] << 8 | rawData[i];
             // 归一化到0-255
-            uchar val = rawValue * (255.0 / 1023.0);
+            uchar val = rawValue >> 2;
             tmpData.append(val);
         }
         rawData = tmpData;
@@ -51,7 +51,6 @@ void PaintWidget::paintEvent(QPaintEvent *event) {
         painter.save();  // 保存当前状态
         painter.translate(m_drawPoint);
         painter.scale(m_scale, m_scale);
-
         // 获取从设备坐标(像素)到逻辑坐标(图像坐标)的变换
         QTransform transform = painter.transform().inverted();
 
@@ -65,12 +64,22 @@ void PaintWidget::paintEvent(QPaintEvent *event) {
         int endY = qMin(m_iRawHeight-1, visibleRect.bottom());
 
         int step = 1;
-        if(m_scale <= 4)
+        if(m_scale <= 4 && m_scale >= 0.5){
             step = 2;
-        else if(m_scale <= 2)
-            step = 4;
-        else if(m_scale <= 1)
-            step = 8;
+            // 只渲染可见部分
+            for (int y = startY; y <= endY; y += step) {
+                for (int x = startX; x <= endX; x += step) {
+                    int idx = x + y * m_iRawWidth;
+                    uchar pixelValue = m_rawData.at(idx);
+                    painter.fillRect(x, y, step, step, QColor(pixelValue, pixelValue, pixelValue));
+                }
+            }
+
+        }
+        else if(m_scale < 0.5){
+            QImage image(reinterpret_cast<const uchar*>(m_rawData.data()), m_iRawWidth, m_iRawHeight, QImage::Format_Grayscale8);
+            painter.drawImage(m_drawPoint, image);
+        }
         else{
             for (int y = startY; y <= endY; y++) {
                 for (int x = startX; x <= endX; x++) {
@@ -79,16 +88,6 @@ void PaintWidget::paintEvent(QPaintEvent *event) {
                     painter.setPen(QColor(pixelValue, pixelValue, pixelValue));
                     painter.drawPoint(x, y);
                 }
-            }
-            painter.restore();  // 恢复状态
-            return;
-        }
-        // 只渲染可见部分
-        for (int y = startY; y <= endY; y += step) {
-            for (int x = startX; x <= endX; x += step) {
-                int idx = x + y * m_iRawWidth;
-                uchar pixelValue = m_rawData.at(idx);
-                painter.fillRect(x, y, step, step, QColor(pixelValue, pixelValue, pixelValue));
             }
         }
         painter.restore();  // 恢复状态
@@ -192,7 +191,10 @@ void PaintWidget::reset(){
 
 // 获取raw图数据
 QByteArray* PaintWidget::getRawData(){
-    return &m_rawData;
+    if(m_rawData != nullptr)
+        return &m_rawData;
+    else
+        return nullptr;
 }
 void PaintWidget::operateRaw(const QByteArray &rawData){
     m_rawData = rawData;
@@ -201,4 +203,21 @@ void PaintWidget::operateRaw(const QByteArray &rawData){
 
 int PaintWidget::getRawWidth(){
     return m_iRawWidth;
+}
+int PaintWidget::getRawHeight(){
+    return m_iRawHeight;
+}
+
+bool PaintWidget::saveRaw(const QString &savePath){
+    bool bRes = false;
+    QFile file(savePath);
+    if (file.open(QIODevice::WriteOnly)) {
+        file.write(m_rawData); // 直接写入二进制数据
+        file.close();
+        bRes = true;
+        return bRes;
+    } else {
+        qDebug() << "Failed to open file for writing";
+        return bRes;
+    }
 }

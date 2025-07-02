@@ -23,6 +23,16 @@ FORMS += \
     paintwidget.ui \
     widget.ui
 
+INCLUDEPATH+= "D:/ProgramPackege/C++/Opencv/Opencv_mingw3.4.8/include/"
+              # D:/ProgramPackege/C++/Opencv/Opencv_mingw3.4.8/include/opencv/
+              # D:/ProgramPackege/C++/Opencv/Opencv_mingw3.4.8/include/opencv2/
+
+LIBS += -L"D:/ProgramPackege/C++/Opencv/Opencv_mingw3.4.8/x64/mingw/bin"
+LIBS += -lopencv_core348 \
+        -lopencv_highgui348 \
+        -lopencv_imgproc348 \
+        -lopencv_imgcodecs348
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin

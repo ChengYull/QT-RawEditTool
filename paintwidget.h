@@ -6,6 +6,8 @@
 #include <QPainter>
 #include <QColor>
 #include <QDebug>
+#include <QFile>
+#include <QImage>
 namespace Ui {
 class PaintWidget;
 }
@@ -26,14 +28,16 @@ public:
     QByteArray* getRawData();
     void operateRaw(const QByteArray &rawData);
     int getRawWidth();
+    int getRawHeight();
+    bool saveRaw(const QString &savePath);
 private:
     Ui::PaintWidget *ui;
     int m_iRawWidth;    // raw图宽度
     int m_iRawHeight;   // raw图高度
     int m_iPixelSize;   // raw图单个像素字节大小
     float m_scale = 1.0;// 缩放倍数
-    QByteArray m_rawDataRoot; // 源数据备份
-    QByteArray m_rawData;   // raw图数据
+    QByteArray m_rawDataRoot = nullptr; // 源数据备份
+    QByteArray m_rawData = nullptr;   // raw图数据
 
     void setZoom(float scale);  // 设置缩放倍数
     bool m_isMousePress = false;// 鼠标是否按下
