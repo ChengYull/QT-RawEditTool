@@ -42,5 +42,6 @@ private:
     QPoint m_roiStart;
     QPoint m_roiEnd;
     QString m_fileBaseName;
+    QString m_version = "v1.0.0";
 };
 #endif // WIDGET_H

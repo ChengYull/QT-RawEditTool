@@ -39,4 +39,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 DISTFILES += \
+    README.md \
     _Idx1__Raw_20250402T172520.4064X3048.raw8_grbg.vcmpos_843.raw

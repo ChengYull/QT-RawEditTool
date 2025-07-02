@@ -6,6 +6,7 @@ Widget::Widget(QWidget *parent)
     , ui(new Ui::Widget)
 {
     ui->setupUi(this);
+    this->setWindowTitle("raw图编辑器 " + m_version);
     this->setLayout(ui->mainLayout);
     connect(ui->paintWidget, &PaintWidget::roiSelectStart, this, [this](const QPoint& point) {
         QString pos = QString("(%1, %2)").arg(point.x()).arg(point.y());
