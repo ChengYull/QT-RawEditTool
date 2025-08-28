@@ -1,0 +1,36 @@
+cmake_minimum_required(VERSION 3.5) # CMake install : https://cmake.org/download/
+project(RawEditTool LANGUAGES CXX)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_PREFIX_PATH "d:/ProgramPackege/QT/6.5.3/msvc2019_64") # Qt Kit Dir
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+find_package(Qt6 COMPONENTS Widgets REQUIRED) # Qt COMPONENTS
+
+
+set(OpenCV_DIR "D:/ProgramPackege/C++/Opencv/opencv4.8.0_msvc17/opencv4.8.0/x64/vc17/lib")
+find_package(OpenCV REQUIRED)
+
+# 包含头文件目录
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+aux_source_directory(./src srcs)
+
+# Specify MSVC UTF-8 encoding   
+add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
+add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+
+add_executable(${PROJECT_NAME}
+    WIN32 # If you need a terminal for debug, please comment this statement 
+    ${srcs} 
+) 
+target_link_libraries(${PROJECT_NAME} PRIVATE 
+    Qt6::Widgets
+    ${OpenCV_LIBS}
+)
+# OpenCV Include Dir
+target_include_directories(${PROJECT_NAME} PRIVATE 
+    ${OpenCV_INCLUDE_DIRS}
+)
